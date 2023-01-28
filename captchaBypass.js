@@ -32,4 +32,4 @@ axios({
 
 }
 
-console.log(getKey())
+getKey()

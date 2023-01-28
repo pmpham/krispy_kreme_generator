@@ -3,46 +3,9 @@ const { on } = require('superagent');
 const superagent = require('superagent').agent()
 const fs = require('fs')
 
-const gen = async () => {
-    var number =Math.floor(Math.random() * (9999999999 - 1000000000 + 1)) + 1000000000;
-    number = number+''
-    var email = number.toString(16)+'AbC';
-    const password = email + "AbC!#$";
-
-    const today = new Date()
-
-    getKey()
-    var bypasskey = fs.readFile('key.txt', (err, inputD) => {
-        if (err) throw err;
-           console.log(inputD.toString());
-     })
-   
-    email = email + "@gmail.com";
-    let home = await superagent.post('https://www.krispykreme.com/account/create-account').send({
-        ctl00$plcMain$txtFirstName: "alex",
-        ctl00$plcMain$txtLastName: "smith",
-        ctl00$plcMain$ddlBirthdayMM: today.getMonth() + 1,
-        ctl00$plcMain$ddlBirthdayDD: today.getDate(),
-        ctl00$plcMain$txtZipCode: '92708',
-        ctl00$plcMain$ucPhoneNumber$txt1st: number.slice(0,3),
-        ctl00$plcMain$ucPhoneNumber$txt2nd: number.slice(3,6),
-        ctl00$plcMain$ucPhoneNumber$txt3rd: number.slice(6,10),
-        ctl00$plcMain$txtEmail: email,
-        ctl00$plcMain$txtPassword: password,
-        ctl00$plcMain$confirmPasswordTxt: password,
-        ctl00$plcMain$cbTermsOfUse: on,
-        'g-recaptcha-response': bypasskey,
-        ctl00$plcMain$btnSubmit: "Sign Up"
-    }).set('Content-Type', 'application/x-www-form-urlencoded');
-
-    console.log(home.text);
-    console.log("email: "+ email)
-    console.log("pass: "+ password)
-}
-
-
-function getKey(){
+async function getKey(){
     const axios = require('axios');
+    const fs = require('fs')
     
     const anchor_url = 'https://www.google.com/recaptcha/api2/anchor?ar=1&k=6Lc4iwIaAAAAAHpijD7fQ_rJIdWZtvpodAsPt8AA&co=aHR0cHM6Ly93d3cua3Jpc3B5a3JlbWUuY29tOjQ0Mw..&hl=en&v=RGRQD9tdxHtnt-Bxkx9pM75S&size=normal&cb=k8i44cqg02oi'
     var url_base = 'https://www.google.com/recaptcha/'
@@ -50,6 +13,7 @@ function getKey(){
     var matches = anchor_url.match(re);
     url_base += matches[0]+'/';
     params = matches[1]
+    
     axios({
         method: 'GET',
         url: url_base + 'anchor',
@@ -65,14 +29,13 @@ function getKey(){
         var post_data = params2['v'] + token + params2['k'] + params2['co']
         var re = new RegExp('value="(.*?)"');
         var key = post_data.match(re)[0].split('"')[1]
-        console.log(key)
         fs.writeFile("key.txt", key, (err) => {if (err) throw err})
+        console.log(key)
     }).catch(error => {
         console.log(error)
-        return (null)
     })
-    }
-
+    
+}
 
 
 const {By,Key,Builder} = require("selenium-webdriver");
@@ -122,18 +85,24 @@ async function example(){
         await driver.findElement(By.name("ctl00$plcMain$confirmPasswordTxt")).sendKeys(password);
         await driver.findElement(By.name('ctl00$plcMain$cbTermsOfUse')).sendKeys(" ")
 
-        //var element = await driver.findElement(By.id('g-recaptcha-response'))
         console.log('befre solving')
-        await getKey()
-        var bypasskey = await fs.readFile('key.txt', (err, inputD) => {
+        var bypasskey = null
+        fs.readFile('key.txt', (err, inputD) => {
             if (err) throw err;
                console.log(inputD.toString());
+               bypasskey = inputD.toString()
         })
-        console.log('made it pass solving')
-        //driver.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
+        /* console.log(bypasskey)
+        console.log('made it pass solving') */
 
-        await driver.executeScript('document.getElementById("g-recaptcha-response").innerHTML = arguments[0]', bypasskey)
-        //driver.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
+        //await driver.executeScript(`document.getElementById("g-recaptcha-response").innerHTML = ${bypasskey}`)
+        await driver.executeScript('var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
+        //await driver.findElement(By.name('g-recaptcha-response')).sendKeys(bypasskey,Key.RETURN)
+        await driver.executeScript(`document.getElementById("g-recaptcha-response").innerHTML = '${bypasskey}'`)
+        /* console.log('bypasskey '+bypasskey) */
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await driver.executeScript('var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
+        await new Promise(resolve => setTimeout(resolve, 10000));
         
         //driver.findElement(By.XPATH, '//*[@id="recaptcha-demo-submit"]').click()
         await driver.findElement(By.name('ctl00$plcMain$btnSubmit')).click()
@@ -142,10 +111,12 @@ async function example(){
         var title = await driver.getTitle();
         console.log('Title is:',title);
     
-        //await setTimeout(10000)
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        //await timeout(10000)
         //It is always a safe practice to quit the browser after execution
         await driver.quit();
     
 }
-    
+
+getKey()
 example()
