@@ -76,6 +76,7 @@ function getKey(){
 
 
 const {By,Key,Builder} = require("selenium-webdriver");
+const { time } = require('console');
 require("chromedriver");
     
 async function example(){
@@ -83,6 +84,12 @@ async function example(){
         const fname = "peter";
         const lname = 'pham'
         const today = new Date()
+
+        var number =Math.floor(Math.random() * (9999999999 - 1000000000 + 1)) + 1000000000;
+        number = number+''
+        var email = number.toString(16);
+        const password = email + "AbC!#$";
+        email = email+'abc@gmail.com'
     
         //To wait for browser to build and launch properly
         let driver = await new Builder().forBrowser("chrome").build();
@@ -107,12 +114,35 @@ async function example(){
         await driver.findElement(By.name("ctl00$plcMain$ddlBirthdayMM")).sendKeys(('0'+(today.getMonth()+1)).slice(-2));
         await driver.findElement(By.name("ctl00$plcMain$ddlBirthdayDD")).sendKeys(today.getDate());
         await driver.findElement(By.name("ctl00$plcMain$txtZipCode")).sendKeys('92708');
+        await driver.findElement(By.name("ctl00$plcMain$ucPhoneNumber$txt1st")).sendKeys(number.slice(0,3));
+        await driver.findElement(By.name("ctl00$plcMain$ucPhoneNumber$txt2nd")).sendKeys(number.slice(3,6));
+        await driver.findElement(By.name("ctl00$plcMain$ucPhoneNumber$txt3rd")).sendKeys(number.slice(6,10));
+        await driver.findElement(By.name("ctl00$plcMain$txtEmail")).sendKeys(email);
+        await driver.findElement(By.name("ctl00$plcMain$txtPassword")).sendKeys(password);
+        await driver.findElement(By.name("ctl00$plcMain$confirmPasswordTxt")).sendKeys(password);
+        await driver.findElement(By.name('ctl00$plcMain$cbTermsOfUse')).sendKeys(" ")
 
-        await setTimeout(5000)
+        //var element = await driver.findElement(By.id('g-recaptcha-response'))
+        console.log('befre solving')
+        await getKey()
+        var bypasskey = await fs.readFile('key.txt', (err, inputD) => {
+            if (err) throw err;
+               console.log(inputD.toString());
+        })
+        console.log('made it pass solving')
+        //driver.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="";')
+
+        await driver.executeScript('document.getElementById("g-recaptcha-response").innerHTML = arguments[0]', bypasskey)
+        //driver.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="none";')
+        
+        //driver.findElement(By.XPATH, '//*[@id="recaptcha-demo-submit"]').click()
+        await driver.findElement(By.name('ctl00$plcMain$btnSubmit')).click()
+        //await Delay(5000)
         //Verify the page title and print it
         var title = await driver.getTitle();
         console.log('Title is:',title);
     
+        //await setTimeout(10000)
         //It is always a safe practice to quit the browser after execution
         await driver.quit();
     
