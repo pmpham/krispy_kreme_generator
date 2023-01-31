@@ -6,7 +6,9 @@
     "dependencies": {
         "axios": "^0.27.2",
         "chromedriver": "^109.0.0",
+        "dotenv": "^16.0.3",
         "geckodriver": "^3.2.0",
+        "node-fetch": "^3.3.0",
         "selenium": "^2.20.0",
         "selenium-webdriver": "^4.8.0",
         "superagent": "^8.0.9"
@@ -15,5 +17,6 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Hartman5",
-    "license": "ISC"
+    "license": "ISC",
+    "type": "module"
 }
