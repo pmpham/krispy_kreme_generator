@@ -43,7 +43,6 @@ try:
     print('solving captcha')
     token = solver.recaptcha(sitekey= sitekey, url = url)
     token = token['code']
-    print(token)
     driver.execute_script(f'document.getElementById("g-recaptcha-response").innerHTML = "{token}"')
     #time.sleep(5)
     driver.execute_script('var element=document.getElementById("g-recaptcha-response"); element.style.display="none"')

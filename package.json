@@ -9,6 +9,7 @@
         "dotenv": "^16.0.3",
         "geckodriver": "^3.2.0",
         "node-fetch": "^3.3.0",
+        "requests": "^0.3.0",
         "selenium": "^2.20.0",
         "selenium-webdriver": "^4.8.0",
         "superagent": "^8.0.9"
