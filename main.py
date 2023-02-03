@@ -18,7 +18,7 @@ fname = 'Kevin'
 lname = 'Nguyen'
 
 number = str(random.randint(1000000000,9999999999)) + ''
-email = "kngu" + number[0:6] + 'Abc@gmail.com'
+email = "kngu714" + number[3:6] + 'Abc@gmail.com'
 password = 'Ilovedonuts123$'
 
 sitekey = '6Lc4iwIaAAAAAHpijD7fQ_rJIdWZtvpodAsPt8AA'    
